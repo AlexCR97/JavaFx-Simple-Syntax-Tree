@@ -29,7 +29,7 @@ public class ExpressionTree {
             var leftValue = (left == null)? "null" : left.value;
             var rightValue = (right == null)? "null" : right.value;
 
-            return leftValue + " <- " + value + " -> " + rightValue;
+            return leftValue + " <- " + rootValue + " -> " + rightValue;
         }
     }
 
@@ -39,16 +39,15 @@ public class ExpressionTree {
     }
 
     public ExpressionTree(String expression) {
-        String postfix = infixToPostfix(expression);
-        root = constructTree(postfix);
+        ArrayList<String> postfixTokens = InfixToPostfix.convert(expression);
+        root = constructTree(postfixTokens);
     }
 
-    private Node constructTree(String postfix) {
-        char[] tokens = postfix.toCharArray();
+    private Node constructTree(ArrayList<String> tokens) {
         var stack = new Stack<Node>();
         Node t, t1, t2;
 
-        for (char token : tokens) {
+        for (String token : tokens) {
 
             t = new Node(String.valueOf(token));
 
@@ -114,54 +113,8 @@ public class ExpressionTree {
         }
     }
 
-    private boolean isOperator(char token) {
-        return token == '+' || token == '-' || token == '*' || token == '/' || token == '^';
-    }
-
-    private String infixToPostfix(String infix) {
-        StringBuilder postfix = new StringBuilder();
-        Stack<Character> stack = new Stack<>();
-
-        for (int i = 0; i < infix.length(); i++) {
-            char currentToken = infix.charAt(i);
-
-            if (getPrecedence(currentToken) > 0) {
-                while(!stack.isEmpty() && getPrecedence(stack.peek()) >= getPrecedence(currentToken))
-                    postfix.append(stack.pop());
-
-                stack.push(currentToken);
-            }
-            else if (currentToken == ')') {
-                char x = stack.pop();
-                while (x != '(') {
-                    postfix.append(x);
-                    x = stack.pop();
-                }
-            }
-            else if (currentToken == '(') {
-                stack.push(currentToken);
-            }
-            else {
-                postfix.append(currentToken);
-            }
-        }
-
-        for (int i = 0; i <= stack.size(); i++) {
-            postfix.append(stack.pop());
-        }
-
-        return postfix.toString();
-    }
-
-    private int getPrecedence(char operator) {
-        switch (operator) {
-            case '+': return 1;
-            case '-': return 1;
-            case '*': return 2;
-            case '/': return 2;
-            case '^': return 3;
-            default: return -1;
-        }
+    private boolean isOperator(String token) {
+        return token.equals("+") ||token.equals("-") ||token.equals("*") ||token.equals("/") ||token.equals("^");
     }
 
 }
